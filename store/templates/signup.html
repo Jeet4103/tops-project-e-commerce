@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<!-- Header-->
+<header class="py-5 header-section" style="background: url('{% static "assets/background.jpg" %}') no-repeat center center/cover;">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-center text-white">
+            <h1 class="display-4 fw-bolder">SignUp</h1>
+            <p class="lead fw-normal text-white-50 mb-0" style="text-align: center; color: #333; font-weight: 500;">Sign up for an account</p>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="row">
+        <center>
+            <div class="col-md-6 offset-md-0">
+                <br>
+                <main style="padding: 1rem;">
+                    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 1rem;">
+                        <div class="signup-form" style="max-width: 600px; margin: 2rem auto; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);">
+                            <form method="POST" action="{% url 'SignUp' %}">
+                                {% csrf_token %}
+                                {% if form.errors %}
+                                <div class="alert alert-danger">
+                                    <ul>
+                                        {% for field, errors in form.errors.items %}
+                                            {% for error in errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                           
+                                <div class="form-group" style="margin-bottom: 1.5rem;">
+                                    <label for="first_name" style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 500; text-align: left;">First Name</label>
+                                    <input type="text" id="first_name" required placeholder="Enter your First Name" name="first_name"
+                                        style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 1.5rem;">
+                                    <label for="last_name" style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 500; text-align: left;">Last Name</label>
+                                    <input type="text" id="last_name" required placeholder="Enter your Last Name" name="last_name"
+                                        style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 1.5rem;">
+                                    <label for="email" style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 500; text-align: left;">Email</label>
+                                    <input type="email" id="email" required placeholder="Enter your Email" name="email"
+                                        style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 1.5rem;">
+                                    <label for="username" style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 500; text-align: left;">Username</label>
+                                    <input type="text" id="username" required placeholder="Choose a Username" name="username"
+                                        style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 1.5rem;">
+                                    <label for="password1" style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 500; text-align: left;">Password</label>
+                                    <input type="password" id="password1" required placeholder="Create a Password" name="password1"
+                                        style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 1.5rem;">
+                                    <label for="password2" style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 500; text-align: left;">Confirm Password</label>
+                                    <input type="password" id="password2" required placeholder="Confirm your Password" name="password2"
+                                        style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                                </div>
+                                <button type="submit" class="signup-button" 
+                                style="width: 100%; padding: 0.75rem; background-color: #000000; color: white; 
+                                border: 1px solid #333333; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; 
+                                transition: background-color 0.3s;" 
+                                onmouseover="this.style.backgroundColor='#333333';" 
+                                onmouseout="this.style.backgroundColor='#000000';">
+                                Sign Up
+                            </button>
+                                
+                                <p class="login-link" style="text-align: center; margin-top: 1.5rem; color: #666;">
+                                    Already have an account? <a href="{% url 'login' %}" style="color: #000000E6; text-decoration: none;">Login</a>
+                                </p>
+                            </form>
+                        </div>
+                    </div>
+                </main>
+
+                <br>                                   
+            </div>
+        </center>
+    </div>
+</div>
+{% endblock content %}

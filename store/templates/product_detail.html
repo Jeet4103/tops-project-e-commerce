@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<!-- Link to the specific CSS file -->
+<link rel="stylesheet" href="{% static 'css/style1.css' %}">
+
+<div class="container">
+    <div class="row">
+        <center>
+            <div class="col-md-12">
+                <br>
+                
+                <!-- Product Page Content -->
+                 
+                <main class="product-main">
+                    <div class="product-container">
+                        <!-- Gallery Section -->
+                        <div class="gallery-container">
+                            <div class="main-image">
+                                <img src="{{ product.thumbnail.url }}" alt="PS Basics Mens Reece - Main View" id="mainImage" />
+                            </div>
+                            <div class="thumbnail-container">
+                                {% for image in images|slice:":4" %}
+                                    <button class="thumbnail {% if forloop.first %}active{% endif %}" data-image="{{ image.image.url }}">
+                                        <img src="{{ image.image.url }}" alt="Product Image {{ forloop.counter }}" />
+                                    </button>
+                                {% empty %}
+                                    <p>No images uploaded for this product.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Product Info Section -->
+                        <div class="product-info">
+                            <h1>{{ product.name }}</h1>
+                            <div class="product-meta">
+                                <div class="ratings">
+                                    <div class="stars">
+                                        <span></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="price-container">
+                                <div class="price-wrapper">
+                                    {% if product.is_sales %}
+                                        <span class="original-price"><strike>₹{{ product.price }}/-</strike></span> 
+                                        &nbsp; <span class="sale-price">₹{{ product.sale_price }}/-</span>
+                                        <span class="discount-tag">{{ product.discount_percentage }}% OFF</span>
+                                    {% else %}
+                                        <span class="sale-price">₹{{ product.price }}/-</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+
+                            <div class="size-selector">
+                                <div class="size-header">
+                                    <h3>Select Size</h3>
+                                    <button class="size-guide-btn"></button>
+                                </div>
+                                <div role="group" aria-label="Size selection" class="size-buttons">
+                                    <button class="size-btn" data-size="XS">XS</button>
+                                    <button class="size-btn" data-size="S">S</button>
+                                    <button class="size-btn selected" data-size="M">M</button>
+                                    <button class="size-btn" data-size="L">L</button>
+                                    <button class="size-btn" data-size="XL">XL</button>
+                                    <button class="size-btn" data-size="XXL">XXL</button>
+                                </div>
+                            </div>
+
+                            <div class="action-buttons">
+                                <button id="checkoutBtn" class="btn-primary">Buy Now</button>
+                                <button id="cartBtn" class="btn-secondary">Add to Cart</button>
+                            </div>
+
+                            <div class="product-details">
+                                <div class="details-section">
+                                    <h3>Product Details</h3>
+                                    <p>{{ product.discription }}</p>
+                                </div>
+
+                                <div class="details-section">
+                                    <h3>Material & Care</h3>
+                                    <ul>
+                                        <li>95% Cotton, 5% Elastane</li>
+                                        <li>Machine wash cold</li>
+                                        <li>Tumble dry low</li>
+                                        <li>Do not bleach</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+
+                <br>
+            </div>
+        </center>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    // DOM Elements
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    const mainImage = document.getElementById('mainImage');
+    const sizeButtons = document.querySelectorAll('.size-btn');
+    const cartBtn = document.getElementById('cartBtn');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    const sizeGuideBtn = document.querySelector('.size-guide-btn');
+
+    // Product State
+    let selectedSize = 'M';
+
+    // Image Gallery
+    thumbnails.forEach(thumbnail => {
+        thumbnail.addEventListener('click', () => {
+            thumbnails.forEach(t => t.classList.remove('active'));
+            thumbnail.classList.add('active');
+            const newImageSrc = thumbnail.getAttribute('data-image');
+            mainImage.src = newImageSrc;
+        });
+    });
+
+    // Size Selection
+    sizeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            selectedSize = button.getAttribute('data-size');
+            sizeButtons.forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+        });
+    });
+
+    // Size Guide
+    sizeGuideBtn.addEventListener('click', () => {
+        alert('Size guide coming soon!');
+    });
+
+    // Cart functionality
+    cartBtn.addEventListener('click', () => {
+        const product = {
+            name: 'PS Basics Mens Reece',
+            size: selectedSize,
+            price: 23.12,
+            quantity: 1
+        };
+        
+        const toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        toast.textContent = 'Added to cart!';
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 2300);
+    });
+
+    // Checkout functionality
+    checkoutBtn.addEventListener('click', () => {
+        if (!selectedSize) {
+            alert('Please select a size before proceeding to checkout.');
+            return;
+        }
+        window.location.href = '/checkout';
+    });
+
+    // Lazy load images
+    document.addEventListener('DOMContentLoaded', () => {
+        const images = document.querySelectorAll('img');
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.src;
+                    observer.unobserve(img);
+                }
+            });
+        });
+
+        images.forEach(img => imageObserver.observe(img));
+    });
+    document.getElementById("uploadForm").addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    let formData = new FormData(this);
+    formData.append("product", document.getElementById("product_id").value);  // Ensure product ID is sent
+
+    fetch(this.action, {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => console.log("Response:", data))  // Debug response
+    .catch(error => console.error("Error uploading images:", error));
+});
+
+</script>
+
+<!-- Font Preconnects -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+{% endblock content %}

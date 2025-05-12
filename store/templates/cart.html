@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<!-- Link to the specific CSS file -->
+<link rel="stylesheet" href="{% static 'css/style2.css' %}">
+
+<div class="cart-page">
+    <div class="container">
+      <div class="cart-container">
+        <div class="cart-header">
+          <h1>Shopping Cart</h1>
+          <span class="items-count">3 items</span>
+        </div>
+        <!-- Cart items will be dynamically generated here -->
+        <div class="cart-items">
+          <div class="cart-item" data-id="1" data-price="44.00">
+              <img src="https://via.placeholder.com/100x100/8B4513" alt="Premium Cotton T-shirt">
+              <div class="item-details">
+                <h3>Premium Cotton T-shirt</h3>
+                <p>Brown / Size M</p>
+              </div>
+              <div class="quantity-controls">
+                <button class="decrease" aria-label="Decrease quantity">−</button>
+                <span>1</span>
+                <button class="increase" aria-label="Increase quantity">+</button>
+              </div>
+              <div class="price">₹44.00</div>
+              <button class="remove-item" aria-label="Remove item">×</button>
+            </div>
+        </div>
+  
+        <a href="#" class="back-link">← Back to shop</a>
+      </div>
+  
+      <div class="summary-container">
+        <h2>Summary</h2>
+        
+        <div class="summary-details">
+          <div class="summary-row">
+            <span>ITEMS 3</span>
+            <span>₹132.00</span>
+          </div>
+          
+          <div class="summary-section">
+            <h3>SHIPPING</h3>
+            <select class="shipping-select">
+              <option value="500">Standard Delivery - ₹500.00</option>
+              <option value="1200">Express Delivery - ₹1200.00</option>
+              <option value="2000">Next Day Delivery - ₹2000.00</option>
+            </select>
+          </div>
+  
+          <div class="summary-section">
+            <h3>GIVE CODE</h3>
+            <input type="text" placeholder="Enter your code" class="code-input">
+          </div>
+  
+          <div class="summary-total">
+            <span>TOTAL PRICE</span>
+            <span>₹137.00</span>
+          </div>
+  
+          <button class="checkout-button">CHECKOUT</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    let cartItems = [];
+  
+    function initializeCart() {
+      const itemElements = document.querySelectorAll('.cart-item');
+  
+      cartItems = Array.from(itemElements).map(el => {
+        return {
+          id: parseInt(el.dataset.id),
+          price: parseFloat(el.dataset.price),
+          quantity: parseInt(el.querySelector('.quantity-controls span').textContent)
+        };
+      });
+  
+      attachEventListeners();
+      updateTotals();
+      updateItemCount();
+    }
+  
+    function attachEventListeners() {
+      document.querySelectorAll('.increase').forEach(button => {
+        button.addEventListener('click', e => {
+          const cartItemEl = e.target.closest('.cart-item');
+          const id = parseInt(cartItemEl.dataset.id);
+          const item = cartItems.find(i => i.id === id);
+          item.quantity++;
+          cartItemEl.querySelector('.quantity-controls span').textContent = item.quantity;
+          updatePrice(cartItemEl, item);
+          updateTotals();
+        });
+      });
+  
+      document.querySelectorAll('.decrease').forEach(button => {
+        button.addEventListener('click', e => {
+          const cartItemEl = e.target.closest('.cart-item');
+          const id = parseInt(cartItemEl.dataset.id);
+          const item = cartItems.find(i => i.id === id);
+          if (item.quantity > 1) {
+            item.quantity--;
+            cartItemEl.querySelector('.quantity-controls span').textContent = item.quantity;
+            updatePrice(cartItemEl, item);
+            updateTotals();
+          }
+        });
+      });
+  
+      document.querySelectorAll('.remove-item').forEach(button => {
+        button.addEventListener('click', e => {
+          const cartItemEl = e.target.closest('.cart-item');
+          const id = parseInt(cartItemEl.dataset.id);
+          cartItems = cartItems.filter(i => i.id !== id);
+          cartItemEl.remove();
+          updateTotals();
+          updateItemCount();
+        });
+      });
+  
+      // Update the total when the shipping option changes
+      document.querySelector('.shipping-select').addEventListener('change', updateTotals);
+    }
+  
+    function updatePrice(cartItemEl, item) {
+      const priceEl = cartItemEl.querySelector('.price');
+      // Update the price for the item based on quantity
+      const itemTotalPrice = item.price * item.quantity;
+      priceEl.textContent = `₹${itemTotalPrice.toFixed(2)}`;
+    }
+  
+    function updateTotals() {
+      const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const shippingCost = parseFloat(document.querySelector('.shipping-select').value);
+      const total = subtotal + shippingCost;
+  
+      // Update subtotal, shipping cost, total price, and item count in the summary section
+      document.querySelector('.summary-row').innerHTML = `
+        <span>ITEMS ${cartItems.length}</span>
+        <span>₹${subtotal.toFixed(2)}</span>
+      `;
+      document.querySelector('.summary-total').innerHTML = `
+        <span>TOTAL PRICE</span>
+        <span>₹${total.toFixed(2)}</span>
+      `;
+    }
+  
+    function updateItemCount() {
+      const count = cartItems.length;
+      document.querySelector('.items-count').textContent = `${count} item${count !== 1 ? 's' : ''}`;
+    }
+  
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeCart();
+  
+      document.querySelector('.checkout-button')?.addEventListener('click', () => {
+        const button = document.querySelector('.checkout-button');
+        button.textContent = 'Processing...';
+        button.disabled = true;
+  
+        setTimeout(() => {
+          alert('Proceeding to checkout...');
+          button.textContent = 'CHECKOUT';
+          button.disabled = false;
+        }, 1000);
+      });
+    });
+  </script>
+  
+
+{% endblock content %}
