@@ -46,16 +46,15 @@ class Products(models.Model):
 
        
 
+# store/models.py
+
 class Inventory(models.Model):
     product = models.ForeignKey(Products, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=0)
 
-    def save(self, *args, **kwargs):
-        self.quantity = self.product.sizes.aggregate(total=Sum('quantity'))['total'] or 0
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return f"{self.product.name} - {self.quantity}"
+
 
 
 class ProductSize(models.Model):
@@ -67,7 +66,7 @@ class ProductSize(models.Model):
     ]
 
     product = models.ForeignKey('Products', related_name='sizes', on_delete=models.CASCADE)
-    size = models.CharField(max_length=2, choices=SIZE_CHOICES)
+    size = models.CharField(max_length=2, choices=SIZE_CHOICES , default='S')
     quantity = models.PositiveIntegerField(default=0)
 
     class Meta:
@@ -75,15 +74,6 @@ class ProductSize(models.Model):
 
     def __str__(self):
         return f"{self.product.name} - {self.size} (Qty: {self.quantity})"
-
-    
-
-
-
-
-
-
-
 
 
 # Product Images
