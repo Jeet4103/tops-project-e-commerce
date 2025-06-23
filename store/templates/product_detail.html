@@ -1,102 +1,109 @@
 {% extends 'base.html' %}
 {% block content %}
 {% load static %}
-<!-- Link to the specific CSS file -->
+
 <link rel="stylesheet" href="{% static 'css/style1.css' %}">
 
 <div class="container">
     <div class="row">
-        <center>
-            <div class="col-md-12">
-                <br>
-                
-                <!-- Product Page Content -->
-                 
-                <main class="product-main">
-                    <div class="product-container">
-                        <!-- Gallery Section -->
-                        <div class="gallery-container">
-                            <div class="main-image">
-                                <img src="{{ product.thumbnail.url }}" alt="PS Basics Mens Reece - Main View" id="mainImage" />
-                            </div>
-                            <div class="thumbnail-container">
-                                {% for image in images|slice:":4" %}
-                                    <button class="thumbnail {% if forloop.first %}active{% endif %}" data-image="{{ image.image.url }}">
-                                        <img src="{{ image.image.url }}" alt="Product Image {{ forloop.counter }}" />
-                                    </button>
-                                {% empty %}
-                                    <p>No images uploaded for this product.</p>
-                                {% endfor %}
+        <div class="col-md-12">
+            <br>
+            <!-- Product Page Content -->
+            <main class="product-main">
+                <div class="product-container">
+                    <!-- Gallery Section -->
+                    <div class="gallery-container">
+                        <div class="main-image">
+                            <img src="{{ product.thumbnail.url }}" alt="{{ product.name }} - Main View" id="mainImage" />
+                        </div>
+                        <div class="thumbnail-container">
+                            {% for image in images|slice:":4" %}
+                                <button class="thumbnail {% if forloop.first %}active{% endif %}" data-image="{{ image.image.url }}">
+                                    <img src="{{ image.image.url }}" alt="Product Image {{ forloop.counter }}" />
+                                </button>
+                            {% empty %}
+                                <p>No images uploaded for this product.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Product Info Section -->
+                    <div class="product-info">
+                        <h1>{{ product.name }}</h1>
+                        <div class="product-meta">
+                            <div class="ratings">
+                                <div class="stars">
+                                    <span></span>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Product Info Section -->
-                        <div class="product-info">
-                            <h1>{{ product.name }}</h1>
-                            <div class="product-meta">
-                                <div class="ratings">
-                                    <div class="stars">
-                                        <span></span>
-                                    </div>
-                                </div>
+                        <div class="price-container">
+                            <div class="price-wrapper">
+                                {% if product.is_sales %}
+                                    <span class="original-price"><strike>₹{{ product.price }}/-</strike></span> 
+                                    &nbsp; <span class="sale-price">₹{{ product.sale_price }}/-</span>
+                                    <span class="discount-tag">{{ product.discount_percentage }}% OFF</span>
+                                {% else %}
+                                    <span class="sale-price">₹{{ product.price }}/-</span>
+                                {% endif %}
                             </div>
+                        </div>
 
-                            <div class="price-container">
-                                <div class="price-wrapper">
-                                    {% if product.is_sales %}
-                                        <span class="original-price"><strike>₹{{ product.price }}/-</strike></span> 
-                                        &nbsp; <span class="sale-price">₹{{ product.sale_price }}/-</span>
-                                        <span class="discount-tag">{{ product.discount_percentage }}% OFF</span>
-                                    {% else %}
-                                        <span class="sale-price">₹{{ product.price }}/-</span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            
-
+                        <form action="" method="post"> 
+                            {% csrf_token %}
                             <div class="size-selector">
                                 <div class="size-header">
                                     <h3>Select Size</h3>
-                                    <button class="size-guide-btn"></button>
+                                    <button type="button" class="size-guide-btn">Size Guide</button>
                                 </div>
-                                <div role="group" aria-label="Size selection" class="size-buttons">
-                                    <button class="size-btn" data-size="XS">XS</button>
-                                    <button class="size-btn" data-size="S">S</button>
-                                    <button class="size-btn selected" data-size="M">M</button>
-                                    <button class="size-btn" data-size="L">L</button>
-                                    <button class="size-btn" data-size="XL">XL</button>
-                                    <button class="size-btn" data-size="XXL">XXL</button>
-                                </div>
+                                
+                              <div role="group" aria-label="Size selection" class="size-buttons">
+                                    {% for size in all_sizes %}
+                                        <button type="button"
+                                                class="size-btn {% if size == 'M' %}selected{% endif %}"
+                                                data-size="{{ size }}"
+                                                {% if size not in available_sizes %}disabled style="opacity:0.5;cursor:not-allowed"{% endif %}>
+                                            {{ size }}
+                                        </button>
+                                    {% endfor %}
+                              </div>
+
                             </div>
 
+                            <input type="hidden" name="size" id="sizeInput" value="M" />
+                                <div style="display: flex; align-items: center; gap: 0.5rem; background: #f7f4f4; padding: 0.5rem; border-radius: 0.5rem; margin-top: 1rem; margin-bottom: 1rem; max-width: 6.5rem;">
+                              <button type="button" aria-label="Decrease quantity" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: white; border: 1px solid #e5e7eb; border-radius: 0.375rem; font-size: 0.875rem; cursor: pointer; color: #4b5563; transition: all 0.2s ease;">−</button>
+                              <span style="min-width: 1.25rem; text-align: center; font-weight: 500; font-size: 0.875rem;">1</span>
+                              <button type="button" aria-label="Increase quantity" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: white; border: 1px solid #e5e7eb; border-radius: 0.375rem; font-size: 0.875rem; cursor: pointer; color: #4b5563; transition: all 0.2s ease;">+</button>
+                            </div>
                             <div class="action-buttons">
-                                <button id="checkoutBtn" class="btn-primary">Buy Now</button>
-                                <button id="cartBtn" class="btn-secondary">Add to Cart</button>
+                                <button type="button" id="checkoutBtn" class="btn-primary">Buy Now</button>
+                                <button type="button" id="cartBtn" class="btn-secondary">Add to Cart</button>
+                            </div>
+                        </form>
+
+                        <div class="product-details">
+                            <div class="details-section">
+                                <h3>Product Details</h3>
+                                <p>{{ product.description }}</p>
                             </div>
 
-                            <div class="product-details">
-                                <div class="details-section">
-                                    <h3>Product Details</h3>
-                                    <p>{{ product.discription }}</p>
-                                </div>
-
-                                <div class="details-section">
-                                    <h3>Material & Care</h3>
-                                    <ul>
-                                        <li>95% Cotton, 5% Elastane</li>
-                                        <li>Machine wash cold</li>
-                                        <li>Tumble dry low</li>
-                                        <li>Do not bleach</li>
-                                    </ul>
-                                </div>
+                            <div class="details-section">
+                                <h3>Material & Care</h3>
+                                <ul>
+                                    <li>95% Cotton, 5% Elastane</li>
+                                    <li>Machine wash cold</li>
+                                    <li>Tumble dry low</li>
+                                    <li>Do not bleach</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
-                </main>
-
-                <br>
-            </div>
-        </center>
+                </div>
+            </main>
+            <br>
+        </div>
     </div>
 </div>
 
@@ -109,9 +116,10 @@
     const cartBtn = document.getElementById('cartBtn');
     const checkoutBtn = document.getElementById('checkoutBtn');
     const sizeGuideBtn = document.querySelector('.size-guide-btn');
+    const sizeInput = document.getElementById('sizeInput');
 
     // Product State
-    let selectedSize = 'M';
+    let selectedSize = sizeInput.value || 'M';
 
     // Image Gallery
     thumbnails.forEach(thumbnail => {
@@ -126,9 +134,13 @@
     // Size Selection
     sizeButtons.forEach(button => {
         button.addEventListener('click', () => {
+            if(button.disabled) return;  // Prevent clicking disabled sizes
+
             selectedSize = button.getAttribute('data-size');
             sizeButtons.forEach(btn => btn.classList.remove('selected'));
             button.classList.add('selected');
+
+            sizeInput.value = selectedSize;
         });
     });
 
@@ -137,23 +149,53 @@
         alert('Size guide coming soon!');
     });
 
+    // Quantity Controls
+    const decreaseBtn = document.querySelector('button[aria-label="Decrease quantity"]');
+    const increaseBtn = document.querySelector('button[aria-label="Increase quantity"]');
+    const quantitySpan = decreaseBtn.nextElementSibling;
+
+    decreaseBtn.addEventListener('click', () => {
+        let currentQuantity = parseInt(quantitySpan.textContent, 10);
+        if (currentQuantity > 1) {
+            quantitySpan.textContent = currentQuantity - 1;
+        }
+    });
+
+    increaseBtn.addEventListener('click', () => {
+        let currentQuantity = parseInt(quantitySpan.textContent, 10);
+        quantitySpan.textContent = currentQuantity + 1;
+    });
+
     // Cart functionality
     cartBtn.addEventListener('click', () => {
-        const product = {
-            name: 'PS Basics Mens Reece',
-            size: selectedSize,
-            price: 23.12,
-            quantity: 1
-        };
-        
         const toast = document.createElement('div');
         toast.className = 'toast-notification';
         toast.textContent = 'Added to cart!';
         document.body.appendChild(toast);
-        
+
         setTimeout(() => {
             toast.remove();
-        }, 2300);
+        }, 2300)
+
+        const quantity = parseInt(quantitySpan.textContent, 10);
+
+        $.ajax({
+            type: 'POST',
+            url: '{% url "cart_add" %}',
+            data: {
+                'product_id': '{{ product.id }}',
+                'quantity': quantity,
+                'size': selectedSize, 
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+                'action': 'post'
+            },
+            success: function(json){
+                document.getElementById('cart_quantity').textContent = json.cart_quantity;
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
+        });
     });
 
     // Checkout functionality
@@ -177,25 +219,10 @@
                 }
             });
         });
-
         images.forEach(img => imageObserver.observe(img));
     });
-    document.getElementById("uploadForm").addEventListener("submit", function (event) {
-    event.preventDefault();
-
-    let formData = new FormData(this);
-    formData.append("product", document.getElementById("product_id").value);  // Ensure product ID is sent
-
-    fetch(this.action, {
-        method: "POST",
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => console.log("Response:", data))  // Debug response
-    .catch(error => console.error("Error uploading images:", error));
-});
-
 </script>
+
 
 <!-- Font Preconnects -->
 <link rel="preconnect" href="https://fonts.googleapis.com">

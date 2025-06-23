@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<!-- Link to CSS -->
+<link rel="stylesheet" href="{% static 'css/style2.css' %}">
+
+<div class="cart-page">
+  <div class="container">
+    <div class="cart-container">
+      <div class="cart-header">
+        <h1>Shopping Cart</h1>
+        <span class="items-count">{{ cart_products|length }} item{{ cart_products|length|pluralize }}</span>
+      </div>
+    
+      <!-- Cart items -->
+      <div class="cart-items">
+        {% for product in cart_products %}
+        <div class="cart-item"
+             data-id="{{ product.id }}"
+             data-price="{{ product.price }}"
+             data-size="{{ product.size }}">
+          <img src="{{ product.thumbnail.url }}" alt="{{ product.name }}">
+          <div class="item-details">
+            <h3>{{ product.name }}</h3>
+            <p>Size: {{ product.size }}</p>
+          </div>
+          <div class="quantity-controls">
+            <button class="decrease" aria-label="Decrease quantity">−</button>
+            <span>{{ product.quantity }}</span>
+            <button class="increase" aria-label="Increase quantity">+</button>
+          </div>
+          <div class="price">₹{{ product.price }}</div>
+          <button class="remove-item" aria-label="Remove item">×</button>
+        </div>
+        {% endfor %}
+      </div>
+
+      <a href="{% url 'home' %}" class="back-link">← Back to shop</a>
+    </div>
+
+    <div class="summary-container">
+      <h2>Summary</h2>
+
+      <div class="summary-details">
+        <div class="summary-row">
+          <span>ITEMS {{ cart_products|length }}</span>
+          <span>₹{{ sub_total }}</span>
+        </div>
+
+        <div class="summary-section">
+          <h3>SHIPPING</h3>
+          <select class="shipping-select">
+            <option value="50">Standard Delivery - ₹50.00</option>
+            <option value="100">Express Delivery - ₹100.00</option>
+            <option value="150">Next Day Delivery - ₹150.00</option>
+          </select>
+        </div>
+
+        <div class="summary-section">
+          <h3>GIVE CODE</h3>
+          <input type="text" placeholder="Enter your code" class="code-input">
+        </div>
+
+        <div class="summary-total">
+          <span>TOTAL PRICE</span>
+          <span>₹{{ sub_total|add:"50" }}</span> 
+        </div>
+
+        <button class="checkout-button">CHECKOUT</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let cartItems = [];
+
+  function initializeCart() {
+    const itemElements = document.querySelectorAll('.cart-item');
+    cartItems = Array.from(itemElements).map(el => {
+      return {
+        id: parseInt(el.dataset.id),
+        price: parseFloat(el.dataset.price),
+        size: el.dataset.size,
+        quantity: parseInt(el.querySelector('.quantity-controls span').textContent)
+      };
+    });
+
+    attachEventListeners();
+    updateTotals();
+    updateItemCount();
+  }
+
+  function attachEventListeners() {
+    document.querySelectorAll('.increase').forEach(button => {
+      button.addEventListener('click', e => {
+        const cartItemEl = e.target.closest('.cart-item');
+        const id = parseInt(cartItemEl.dataset.id);
+        const item = cartItems.find(i => i.id === id);
+        item.quantity++;
+        cartItemEl.querySelector('.quantity-controls span').textContent = item.quantity;
+        updatePrice(cartItemEl, item);
+        updateTotals();
+      });
+    });
+
+    document.querySelectorAll('.decrease').forEach(button => {
+      button.addEventListener('click', e => {
+        const cartItemEl = e.target.closest('.cart-item');
+        const id = parseInt(cartItemEl.dataset.id);
+        const item = cartItems.find(i => i.id === id);
+        if (item.quantity > 1) {
+          item.quantity--;
+          cartItemEl.querySelector('.quantity-controls span').textContent = item.quantity;
+          updatePrice(cartItemEl, item);
+          updateTotals();
+        }
+      });
+    });
+
+    document.querySelector('.shipping-select').addEventListener('change', updateTotals);
+  }
+
+  function updatePrice(cartItemEl, item) {
+    const priceEl = cartItemEl.querySelector('.price');
+    const itemTotalPrice = item.price * item.quantity;
+    priceEl.textContent = `₹${itemTotalPrice.toFixed(2)}`;
+  }
+
+  function updateTotals() {
+    const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const shippingCost = parseFloat(document.querySelector('.shipping-select').value);
+    const total = subtotal + shippingCost;
+
+    document.querySelector('.summary-row').innerHTML = `
+      <span>ITEMS ${cartItems.length}</span>
+      <span>₹${subtotal.toFixed(2)}</span>
+    `;
+    document.querySelector('.summary-total').innerHTML = `
+      <span>TOTAL PRICE</span>
+      <span>₹${total.toFixed(2)}</span>
+    `;
+  }
+
+  function updateItemCount() {
+    const count = cartItems.length;
+    document.querySelector('.items-count').textContent = `${count} item${count !== 1 ? 's' : ''}`;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initializeCart();
+
+    document.querySelector('.checkout-button')?.addEventListener('click', () => {
+      const button = document.querySelector('.checkout-button');
+      button.textContent = 'Processing...';
+      button.disabled = true;
+
+      setTimeout(() => {
+        console.log('Checkout data:', cartItems);
+        alert('Proceeding to checkout...');
+        button.textContent = 'CHECKOUT';
+        button.disabled = false;
+      }, 1000);
+    });
+  });
+
+  // delete functionality
+ $(document).on('click', '.remove-item', function(e) {
+  e.preventDefault();
+  const $cartItem = $(this).closest('.cart-item');
+  const productId = $cartItem.data('id');
+  const size = $cartItem.data('size');
+
+  $.ajax({
+    type: 'POST',
+    url: '{% url "cart_delete" %}',
+    data: {
+      'product_id': productId,
+      'size': size,
+      'csrfmiddlewaretoken': '{{ csrf_token }}'
+    },
+    success: function(response) {
+      $cartItem.remove();
+      updateTotals();
+      updateItemCount();
+      $('#cart_quantity').text(response.cart_quantity);
+    },
+    error: function(xhr, status, error) {
+      console.error(error);
+    }
+    
+  });
+});
+
+</script>
+
+{% endblock content %}

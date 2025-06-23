@@ -11,19 +11,22 @@
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  padding-top:10px;
+  padding-bottom:10px;
 }
 
 .cart-page .container {
   max-width: 1200px;
-  margin: 0 auto;
-  
-  padding: 2.5rem;
+  margin: 0 auto 3rem auto;
+
+  padding: 3rem;
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 3rem;
   background: white;
   border-radius: 1.25rem;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+  
 }
 
 .cart-header {

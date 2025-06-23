@@ -93,6 +93,22 @@
     margin-right: 0.5rem;
 }
 
+.toast-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #4caf50; /* green for success */
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 9999;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.toast-notification.error {
+  background: #f44336; /* red for error */
+}
+
 .stars span {
     color: #757575;
     font-size: 0.9rem;

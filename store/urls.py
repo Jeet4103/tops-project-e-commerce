@@ -12,5 +12,8 @@ urlpatterns = [
    path('SignUp/', views.SignUp, name='SignUp'),
    path('Product_Detail/<int:pk>', views.product_detail, name='product_detail'),
    path('upload-images/', views.upload_product_images, name='upload_product_images'),
-   path('cart/', views.cart, name='cart'),
+   path('category/<str:category_name>/', views.category, name='category'),
+   path('Profile_update/',views.Profile_update,name='Profile'),
+   path('Password_update/',views.Password_update,name='Password_update')
 ]
+   

@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Header -->
+<header class="py-5 header-section" style="background: url('{% static 'assets/background.jpg' %}') no-repeat center center / cover;">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-center text-white">
+            <h1 class="display-4 fw-bolder">Update Profile</h1>
+            <p class="lead fw-normal text-white-50 mb-0">Update your account information</p>
+        </div>
+    </div>
+</header>
+
+<!-- Profile Form Section -->
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <main style="padding: 1rem;">
+                <div style="max-width: 900px; margin: 2rem auto; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);">
+                    
+                    <form method="POST" action="{% url 'Profile' %}">
+                        {% csrf_token %}
+
+                        {% if user_info.errors or user_info.errors %}
+                        <div style="margin-bottom: 1rem; padding: 1rem; background-color: #ffe0e0; border-radius: 5px; color: #a94442;">
+                            <ul style="margin: 0; padding-left: 1.2rem;">
+                                {% for field, errors in user_info.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for field, errors in user_info.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        <!-- Username -->
+                        <div style="margin-bottom: 1.2rem;">
+                            <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Username</label>
+                            <input type="text" name="username" value="{{ user_info.username.value|default:user.username }}" readonly
+                                   style="width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+
+                        <!-- First Name -->
+                        <div style="margin-bottom: 1.2rem;">
+                            <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">First Name</label>
+                            <input type="text" name="first_name" required value="{{ user_info.first_name.value|default:user.first_name }}"
+                                   style="width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+
+                        <!-- Last Name -->
+                        <div style="margin-bottom: 1.2rem;">
+                            <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Last Name</label>
+                            <input type="text" name="last_name" required value="{{ user_info.last_name.value|default:user.last_name }}"
+                                   style="width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+
+                        <!-- Email -->
+                        <div style="margin-bottom: 2rem;">
+                            <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Email</label>
+                            <input type="email" name="email" required value="{{ user_info.email.value|default:user.email }}"
+                                   style="width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+
+                        <!-- Other Details Section -->
+                        <h5 style="margin-bottom: 1rem; font-weight: 600; color: #333;">Other Details</h5>
+
+                        <div style="display: flex; flex-wrap: wrap; gap: 1.5rem;">
+
+                            <!-- Phone -->
+                            <div style="flex: 1 1 45%;">
+                                <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">Phone</label>
+                                <input type="text" name="phone" value="{{ user_info.phone.value|default_if_none:'' }}"
+                                       style="width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+
+                            <!-- Address1 -->
+                            <div style="flex: 1 1 45%;">
+                                <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">Address Line 1</label>
+                                <input type="text" name="address1" value="{{ user_info.address1.value|default_if_none:'' }}"
+                                       style="width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+
+                            <!-- Address2 -->
+                            <div style="flex: 1 1 45%;">
+                                <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">Address Line 2</label>
+                                <input type="text" name="address2" value="{{ user_info.address2.value|default_if_none:'' }}"
+                                       style="width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+
+                            <!-- City -->
+                            <div style="flex: 1 1 45%;">
+                                <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">City</label>
+                                <input type="text" name="city" value="{{ user_info.city.value|default_if_none:'' }}"
+                                       style="width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+
+                            <!-- State -->
+                            <div style="flex: 1 1 45%;">
+                                <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">State</label>
+                                <input type="text" name="state" value="{{ user_info.state.value|default_if_none:'' }}"
+                                       style="width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+
+                            <!-- Zipcode -->
+                            <div style="flex: 1 1 45%;">
+                                <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">Zipcode</label>
+                                <input type="text" name="zipcode" value="{{ user_info.zipcode.value|default_if_none:'' }}"
+                                       style="width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+
+                            <!-- Country -->
+                            <div style="flex: 1 1 45%;">
+                                <label style="font-weight: 500; display: block; margin-bottom: 0.5rem;">Country</label>
+                                <input type="text" name="country" value="{{ user_info.country.value|default_if_none:'' }}"
+                                       style="width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px;">
+                            </div>
+                        </div>
+
+                        <!-- Submit Row -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem;">
+                            <a href="{% url 'Password_update' %}" style="text-decoration: none; color: #000000E6;">Update Password</a>
+                            <button type="submit"
+                                style="padding: 0.75rem 1.5rem; background-color: #000000; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;"
+                                onmouseover="this.style.backgroundColor='#333333';"
+                                onmouseout="this.style.backgroundColor='#000000';">
+                                Update
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </main>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
